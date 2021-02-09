@@ -13,7 +13,7 @@ class Vector:
         return Vector(0, 0, 0)
 
     def normalized(self):
-        return self.magnitude() * self
+        return 1 / self.magnitude() * self
 
     def magnitude(self):
         return (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
