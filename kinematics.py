@@ -86,8 +86,8 @@ class Quaternion:
     def from_angle_axis(angle, axis, math_source=np, unit=True):
         if not unit:
             axis = axis.normalized()
-        c = math_source.cos(angle / 2.0)
-        s = math_source.sin(angle / 2.0)
+        c = math_source.cos(angle / 2)
+        s = math_source.sin(angle / 2)
         return Quaternion(
             c,
             s * axis.x,
