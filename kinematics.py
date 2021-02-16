@@ -2,7 +2,30 @@ import numpy as np
 
 
 class Vector:
+    """Vector represents translation and stores 3 values
+
+    Attributes
+    ----------
+    x
+        The x value
+    y
+        The y value
+    z
+        The z value
+    """
+
     def __init__(self, x, y, z):
+        """
+        Parameters
+        ----------
+        x
+            The x value
+        y
+            The y value
+        z
+            The z value
+        """
+
         super(Vector, self).__init__()
         self.x = x
         self.y = y
@@ -10,15 +33,29 @@ class Vector:
 
     @staticmethod
     def zero():
+        """Creates vector with zero x, y and z"""
+
         return Vector(0, 0, 0)
 
     def normalized(self):
+        """Calculates colinear vector with length 1"""
+
         return 1 / self.magnitude() * self
 
     def magnitude(self):
+        """Calculates Euclidean length of vector"""
+
         return (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
 
     def times(self, other):
+        """Multiplies vector by scalar value
+
+        Parameters
+        ----------
+        other
+            The scalar value to multiply on
+        """
+
         return Vector(
             other * self.x,
             other * self.y,
@@ -47,7 +84,34 @@ class Vector:
 
 
 class Quaternion:
+    """Quaternion represents rotation and stores 4 values
+
+    Attributes
+    ----------
+    w
+        The w value
+    x
+        The x value
+    y
+        The y value
+    z
+        The z value
+    """
+
     def __init__(self, w, x, y, z):
+        """
+        Parameters
+        ----------
+        w
+            The w value
+        x
+            The x value
+        y
+            The y value
+        z
+            The z value
+        """
+
         super(Quaternion, self).__init__()
         self.w = w
         self.x = x
@@ -56,17 +120,37 @@ class Quaternion:
 
     @staticmethod
     def identity():
+        """Creates quaternion representing no rotation"""
+
         return Quaternion(1, 0, 0, 0)
 
     def rotate(self, vector):
+        """Rotates given vector
+
+        Parameters
+        ----------
+        vector
+            Vector to be rotated
+        """
+
         pure = Quaternion(0, vector.x, vector.y, vector.z)
         rotated = self * pure * self.conjugate()
         return Vector(rotated.x, rotated.y, rotated.z)
 
     def conjugate(self):
+        """Calculates quaternion representing reverse rotation"""
+
         return Quaternion(self.w, -self.x, -self.y, -self.z)
 
     def multiply(self, other):
+        """Multiplies quaternion on other quaternion
+
+        Parameters
+        ----------
+        other
+            The other quaternion to multiply on
+        """
+
         return Quaternion(
             self.w * other.w - self.x * other.x - self.y * other.y - self.z * other.z,
             self.w * other.x + self.x * other.w + self.y * other.z - self.z * other.y,
@@ -75,6 +159,14 @@ class Quaternion:
         )
 
     def times(self, other):
+        """Multiplies quaternion on scalar
+
+        Parameters
+        ----------
+        other
+            The scalar value to multiply on
+        """
+
         return Quaternion(
             other * self.w,
             other * self.x,
@@ -84,6 +176,20 @@ class Quaternion:
 
     @staticmethod
     def from_angle_axis(angle, axis, math_source=np, unit=True):
+        """Calculates quaternion representing rotation around given axis on given angle
+
+        Parameters
+        ----------
+        angle
+            The rotation angle in radians
+        axis
+            The rotation axis
+        math_source
+            The source of sin and cos operations, default is numpy
+        unit
+            Marks if axis is considered unit, default is True
+        """
+
         if not unit:
             axis = axis.normalized()
         c = math_source.cos(angle / 2)
@@ -113,13 +219,34 @@ class Quaternion:
 
 
 class Transform:
+    """Transform represents translation and rotation
+
+    Attributes
+    ----------
+    translation
+        The translation vector
+    rotation
+        The rotation quaternion
+    """
+
     def __init__(self, translation: Vector, rotation: Quaternion):
+        """
+        Parameters
+        ----------
+        translation
+            The translation vector
+        rotation
+            The rotation quaternion
+        """
+
         super(Transform, self).__init__()
         self.translation = translation
         self.rotation = rotation
 
     @staticmethod
     def identity():
+        """Creates Transform representing no translation and no rotation"""
+
         return Transform(
             Vector.zero(),
             Quaternion.identity()
