@@ -62,6 +62,24 @@ class Vector:
             other * self.z
         )
 
+    def cross(self, other):
+        return Vector(
+            self.y * other.z - self.z * other.y,
+            self.z * other.x - self.x * other.z,
+            self.x * other.y - self.y * other.x,
+        )
+
+    def dot(self, other):
+        return self.x * other.x + self.y * other.y + self.z * other.z
+
+    def angle_to(self, other, axis):
+        crossed = self.cross(other)
+        collinearity = crossed.dot(axis)
+        return np.arctan2(
+            crossed.magnitude(),
+            self.dot(other)
+        ) * (1 if collinearity > 0.0 else -1)
+
     def __str__(self):
         return "[{}, {}, {}]".format(self.x, self.y, self.z)
 
@@ -250,6 +268,13 @@ class Transform:
         return Transform(
             Vector.zero(),
             Quaternion.identity()
+        )
+
+    def inverse(self):
+        conj = self.rotation.conjugate()
+        return Transform(
+            conj * (-1 * self.translation),
+            conj
         )
 
     def __str__(self):
