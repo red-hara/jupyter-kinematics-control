@@ -37,6 +37,12 @@ class Vector:
 
         return Vector(0, 0, 0)
 
+    @staticmethod
+    def lerp(start, end, t):
+        """Calculates linear interpolation between start and end for given t"""
+
+        return start + t * (end + -1 * start)
+
     def normalized(self):
         """Calculates colinear vector with length 1"""
 
@@ -155,6 +161,27 @@ class Quaternion:
         rotated = self * pure * self.conjugate()
         return Vector(rotated.x, rotated.y, rotated.z)
 
+    def magnitude(self):
+        return (self.w ** 2 + self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
+
+    def normalized(self):
+        return 1 / self.magnitude() * self
+
+    def dot(self, other):
+        return self.w * other.w + self.x * other.x + self.y * other.y + self.z * other.z
+
+    @staticmethod
+    def slerp(start, end, t):
+        dot = start.dot(end)
+        if dot < 0.0:
+            start = -1 * start
+            dot = -dot
+        if dot >= 1.0:
+            return start
+        theta = np.arccos(dot) * t
+        q = (end + -dot * start).normalized()
+        return np.cos(theta) * start + np.sin(theta) * q
+
     def conjugate(self):
         """Calculates quaternion representing reverse rotation"""
 
@@ -174,6 +201,14 @@ class Quaternion:
             self.w * other.x + self.x * other.w + self.y * other.z - self.z * other.y,
             self.w * other.y - self.x * other.z + self.y * other.w + self.z * other.x,
             self.w * other.z + self.x * other.y - self.y * other.x + self.z * other.w
+        )
+
+    def plus(self, other):
+        return Quaternion(
+            self.w + other.w,
+            self.x + other.x,
+            self.y + other.y,
+            self.z + other.z
         )
 
     def times(self, other):
@@ -232,6 +267,9 @@ class Quaternion:
             return self.multiply(other)
         return self.times(other)
 
+    def __add__(self, other):
+        return self.plus(other)
+
     def __rmul__(self, other):
         return self.times(other)
 
@@ -275,6 +313,13 @@ class Transform:
         return Transform(
             conj * (-1 * self.translation),
             conj
+        )
+
+    @staticmethod
+    def lerp(start, end, t):
+        return Transform(
+            Vector.lerp(start.translation, end.translation, t),
+            Quaternion.slerp(start.rotation, end.rotation, t)
         )
 
     def __str__(self):
